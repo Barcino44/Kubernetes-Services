@@ -106,7 +106,7 @@ When exposing the deployment, the service type (LoadBalancer) is specified:
 kubectl expose deployment app-loadbalancer --port=80 --target-port=8080 --type=LoadBalancer --name=svc-loadbalancer
 ```
 
-Since there is no cloud provider, a tunnel was created to access the service through localhost:
+Since there is no cloud provider, a tunnel was created to access the service through localhost.
 
 <p align="center">
   <img width="1059" height="216" alt="image" src="https://github.com/user-attachments/assets/4da38549-f51f-4455-9de3-e5336130766d" />
@@ -189,7 +189,7 @@ In this YAML, the following is defined:
 - The Ingress name: `ingress-http-echo`
 - The Ingress class name: `nginx` (refers to the NGINX Ingress Controller)
 - The service the Ingress points to: `svc-ingress` (previously exposed).
-- The Service port to which Ingress routes traffic: `port: number 80` (port of the svc-ingress Service).
+- The Service port to which Ingress routes traffic: `port: number 80` (port of the svc-ingress service).
 
 Subsequently, the configurations from the YAML are applied using:
 ```bash
