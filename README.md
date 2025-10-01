@@ -244,9 +244,6 @@ Podemos ver la descrpción de los servicios así como los endpoints creados dura
 
 **Endpoints:**
 
-````
-kubectl get endpoints
-````
 <p align="center">
   <img width="820" height="193" alt="image" src="https://github.com/user-attachments/assets/6888792b-d747-4511-b34e-00e7a0fd1e5d" />
 </p>
