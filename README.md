@@ -106,11 +106,18 @@ When exposing the deployment, the service type (LoadBalancer) is specified:
 kubectl expose deployment app-loadbalancer --port=80 --target-port=8080 --type=LoadBalancer --name=svc-loadbalancer
 ```
 
+Initialy, the service's external ip is pending state.
+
+<img width="836" height="133" alt="image" src="https://github.com/user-attachments/assets/cf95e8bb-bd2e-45bd-beb9-97d5897e2cd2" />
+
+
 Since there is no cloud provider, a tunnel was created to access the service through localhost.
 
 <p align="center">
   <img width="1059" height="216" alt="image" src="https://github.com/user-attachments/assets/4da38549-f51f-4455-9de3-e5336130766d" />
 </p>
+
+This give us an external ip to access the service.
 
 <p align="center">
   <img width="827" height="141" alt="image" src="https://github.com/user-attachments/assets/ca12ef3b-3341-4b37-8783-1a9cda5ce576" />
@@ -148,7 +155,7 @@ The IP address provided by minikube (minikube ip) + that port will be used to ac
   <img width="494" height="65" alt="image" src="https://github.com/user-attachments/assets/09196755-34a2-4fd5-8f0f-18f71a662a18" />
 </p>
 
-### 2.4 Ingress (Caddy)
+### 2.4 Ingress (caddy)
 
 For the Ingress case, the Caddy image was used.
 
