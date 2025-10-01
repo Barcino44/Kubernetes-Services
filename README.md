@@ -1,110 +1,109 @@
-# Kubernetes-Services
+## Description:
 
-## Descripción:
+This repository aims to explain the implementation of 4 deployments (each with different images) using different types of Kubernetes services (ClusterIP, NodePort, LoadBalancer, and Ingress).
 
-El presente repositorio tiene como objetivo explicar la implementación de 4 deployments (Cada uno con imagenes diferentes) usando diferentes tipos de servicios de Kubernetes (ClusterIp, Nodeport, LoadBalancer e Ingress).
+## Solution:
 
-## Solución:
+The following steps were used to complete the lab:
 
-Para la realización del laboratorio, se emplearon los siguientes pasos:
+## 1. Minikube Configuration
 
-## 1. Configuración de minikube
-
-La inicialización de minikube se realizó con ayuda del comando.
-````
+Minikube initialization was performed using the command:
+```bash
 minikube start --driver=docker
-````
-Posteriormente, se visualizó el estado del cluster con ayuda de.
-````
+```
+
+Subsequently, the cluster status was viewed using:
+```bash
 minikube status
-````
+```
 <p align="center">
   <img width="466" height="164" alt="image" src="https://github.com/user-attachments/assets/06e411d9-fd4e-43ff-bcca-eb7cfe13441d" />
 </p>
 
-Finalmente, se verificó la dirección ip del cluster.
+Finally, the cluster IP address was verified.
 
 <p align="center">
   <img width="366" height="72" alt="image" src="https://github.com/user-attachments/assets/c3492c55-83a4-4225-a36c-b05b123464f3" />
 </p>
 
-También, se mostraron la lista de servicios. Lo anterior con ayuda de.
-
-````
+The list of services was also displayed using:
+```bash
 minikube service list
-````
-Además de la visualización del dashboard del cluster.
+```
+
+Additionally, the cluster dashboard was visualized.
 
 <p align="center">
   <img width="798" height="399" alt="image" src="https://github.com/user-attachments/assets/5b8dd84c-4e3f-4314-a6ad-9eada7373225" />
 </p>
 
-````
+```bash
 minikube dashboard
-````
+```
 <p align="center">
   <img width="1906" height="616" alt="image" src="https://github.com/user-attachments/assets/f6c06f33-804a-45ea-8c1d-b0c0d005d964" />
 </p>
 
-***Dashboard tras finalizar el laboratorio***
+***Dashboard after completing the lab***
 
-Por otro lado, los nodos que más consumen memoria se decubrieron gracias a.
-
-````
+On the other hand, the nodes that consume the most memory were discovered using:
+```bash
 kubectl top nodes
-````
+```
 <p align="center">
   <img width="567" height="97" alt="image" src="https://github.com/user-attachments/assets/ab0682f1-74c3-49b8-b983-06fbea087424" />
 </p>
 
-## 2. Creación de deployments y services.
+## 2. Creating Deployments and Services
 
-**Definiciones:**
+**Definitions:**
 
-•	port: Se refiere al puerto donde escucha la aplicación (Ngnix).
-•	targetPort: Se refiere al puerto del service, por aquí se establece comunicación con otros pods de manera interna en el cluster.
-•	NodePort: Puerto por donde escucha el nodo, accesible por otros nodos.
+- **port**: Port exposed by the Service within the cluster (where other pods/services connect to).
+- **targetPort**: Port where the application inside the container/pod actually listens.
+- **NodePort**: Port exposed on the node, accessible externally (range: 30000-32767).
 
-### 2.1 ClusterIP (ngnix)
+### 2.1 ClusterIP (nginx)
 
-Para el caso del tipo de servicio ClusterIP, se empleó la imagen de ngnix. 
+For the ClusterIP service type, the nginx image was used.
 
-En primera instancia, se creo el deployment con 2 replicas con ayuda de.
-
-````
+First, the deployment was created with 2 replicas using:
+```bash
 kubectl create deployment app-clusterip --image=nginx --replicas=2
-````
-Posteriormente, se creo un servicio para exponer dicho deployment especificando su tipo como ClusterIP.
+```
 
-````
+Subsequently, a service was created to expose the deployment, specifying its type as ClusterIP:
+```bash
 kubectl expose deployment app-clusterip --port=80 --target-port=80 --type=ClusterIP --name=svc-clusterip
-````
-Los servicios de tipo ClusterIP unicamente pueden ser accedidos por pods al interior del cluster. Por tanto, fue creado un pod éfimero al interior del cluster para acceder al servicio a traves del target-port (80).
+```
 
-````
+ClusterIP services can only be accessed by pods inside the cluster. Therefore, an ephemeral pod was created inside the cluster to access the service through the target-port (80):
+```bash
 kubectl run curl --image=curlimages/curl -it --rm --restart=Never -- \
   curl http://svc-clusterip:80
-````
-Tras ejecutarlo, podemos apreciar la vista de la página web de ngnix.
+```
+
+After executing it, we can see the nginx web page view.
 
 <p align="center">
   <img width="926" height="571" alt="image" src="https://github.com/user-attachments/assets/11502629-e409-4ea9-8c3e-44afe4fff33e" />
 </p>
 
-### 2.2 Load Balancer (tomcat)
+### 2.2 LoadBalancer (tomcat)
 
-Ahora para el caso de LoadBalancer, se uso la imagen de tomcat.
+For the LoadBalancer case, the tomcat image was used.
 
-En este caso, nuevamente el deployment fue creado con 2 replicas con ayuda de.
-
-````
+In this case, the deployment was again created with 2 replicas using:
+```bash
 kubectl create deployment app-loadbalancer --image=tomcat --replicas=2
-````
-En la exposición del deployment, se especifica el tipo de servicio (LoadBalancer).
-````
+```
+
+When exposing the deployment, the service type (LoadBalancer) is specified:
+```bash
 kubectl expose deployment app-loadbalancer --port=80 --target-port=8080 --type=LoadBalancer --name=svc-loadbalancer
-````
-Al no existir un proveedor de nube, fue creado un tunel para acceder al servicio a traves de mi localhost.
+```
+
+Since there is no cloud provider, a tunnel was created to access the service through localhost:
 
 <p align="center">
   <img width="1059" height="216" alt="image" src="https://github.com/user-attachments/assets/4da38549-f51f-4455-9de3-e5336130766d" />
@@ -118,28 +117,29 @@ Al no existir un proveedor de nube, fue creado un tunel para acceder al servicio
   <img width="1002" height="311" alt="image" src="https://github.com/user-attachments/assets/41de8304-278b-4b3d-bdbe-a03d1697d783" />
 </p>
 
-***La imagen de tomcat sin modificaciones arroja 404***
+***The unmodified tomcat image returns 404***
 
-### 2.3 Nodeport (httpd)
+### 2.3 NodePort (httpd)
 
-Para el caso de Nodeport, se uso la imagen de httpd.
+For the NodePort case, the httpd image was used.
 
-Fue creado el deployment con 2 replicas con ayuda de.
-````
+The deployment was created with 2 replicas using:
+```bash
 kubectl create deployment app-nodeport --image=httpd --replicas=2
-````
-Luego, fue expuesto el deployment, y se especificó el tipo de servicio (Nodeport).
+```
 
-````
+Then, the deployment was exposed and the service type (NodePort) was specified:
+```bash
 kubectl expose deployment app-nodeport --port=80 --target-port=80 --type=NodePort --name=svc-nodeport 
-````
-Vemos que el puerto disponible para el acceso de otros nodos fue auto generado (30150). 
+```
+
+We can see that the port available for access by other nodes was auto-generated (30150).
 
 <p align="center">
   <img width="833" height="129" alt="image" src="https://github.com/user-attachments/assets/4cb7c091-63ed-4d53-a62d-01f39a3f661a" />
 </p>
 
-Será usada la dirección ip provista por minikube (minikube ip) + dicho puerto para acceder al servicio.
+The IP address provided by minikube (minikube ip) + that port will be used to access the service.
 
 <p align="center">
   <img width="494" height="65" alt="image" src="https://github.com/user-attachments/assets/09196755-34a2-4fd5-8f0f-18f71a662a18" />
@@ -147,20 +147,20 @@ Será usada la dirección ip provista por minikube (minikube ip) + dicho puerto 
 
 ### 2.4 Ingress (Caddy)
 
-Para el caso de Ingress, fue usada la imagen de Caddy.
+For the Ingress case, the Caddy image was used.
 
-En este caso, también se sigue un proceso similar. Fue creado el deployment con 2 replicas con ayuda de.
-
-````
+In this case, a similar process is followed. The deployment was created with 2 replicas using:
+```bash
 kubectl create deployment app-ingress --image=caddy --replicas=2
-````
-Y fue expuesto dicho deployment. Sin embargo, el tipo de servicio especificado fue ClusterIP. Como se vio anteriormente, normalmente solo puede ser accedido por pods al interior del cluster, esto cambiará con ayuda de ingress.
-````
-kubectl expose deployment app-ingress --port=80 --target-port=80 --type=Cluster-ip --name=svc-ingress
-````
-Tras lo anterior, fue creado un archivo ``myapp-ingress.yaml``  para definir el ingress. Este es mostrado a continuación.
+```
 
-````
+The deployment was exposed. However, the service type specified was ClusterIP. As seen earlier, it can normally only be accessed by pods inside the cluster, but this will change with the help of Ingress:
+```bash
+kubectl expose deployment app-ingress --port=80 --target-port=80 --type=ClusterIP --name=svc-ingress
+```
+
+After that, a `myapp-ingress.yaml` file was created to define the Ingress. It is shown below:
+```yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -179,44 +179,44 @@ spec:
             name: svc-ingress
             port:
               number: 80
-````
-En dicho yaml, es definido.
+```
 
-- El nombre del ingress ``ingress-http-echo``
-- El nombre de la clase ``ngnix`` (Es un nombre cualquiera, debería ser caddy para ser diciente).
-- El servicio al que apunta el ingress ``svc-ingress`` (Anteriormente expuesto).
-- El puerto al cual ingress envía el tráfico  ``port: number 80`` (puerto de la aplicación).
+In this YAML, the following is defined:
 
-Posteriormente, se aplican las configuraciones de dicho yaml con ayuda de.
+- The Ingress name: `ingress-http-echo`
+- The Ingress class name: `nginx` (refers to the NGINX Ingress Controller)
+- The service the Ingress points to: `svc-ingress` (previously exposed).
+- The Service port to which Ingress routes traffic: `port: number 80` (port of the svc-ingress Service).
 
-````
+Subsequently, the configurations from the YAML are applied using:
+```bash
 kubectl apply -f myapp-ingress.yaml
-````
-Tras esto, se pueden visualizar los ingress presentes en el cluster con ayuda de.
+```
 
-````
+After this, the Ingresses present in the cluster can be viewed using:
+```bash
 kubectl get ingress
-````
+```
 
-La dirección ip del ingress tarda alrededor de un minuto en ser asignada. En este caso, fue asignada la correspondiente a la ip del cluster (minikube ip).
+The Ingress IP address takes around a minute to be assigned. In this case, the one corresponding to the cluster IP (minikube ip) was assigned.
 
 <p align="center">
   <img width="626" height="67" alt="image" src="https://github.com/user-attachments/assets/ce60ef0d-a247-4540-a452-b076bb7ed72e" />
 </p>
 
-Finalmente, se emplea dicha ip para acceder al servicio de caddy.
+Finally, this IP is used to access the Caddy service.
 
 <p align="center">
   <img width="802" height="308" alt="image" src="https://github.com/user-attachments/assets/beb7a43e-8bd3-4c7c-a979-71b9963dd26e" />
 </p>
 
-Vemos que se puede acceder a el a pesar de que caddy se encuentra corriendo en servicio de tipo ClusterIP.
+We can see that it can be accessed even though Caddy is running on a ClusterIP service type.
 
-### 3. Visualización.
+## 3. Visualization
 
-Podemos ver la descrpción de los servicios así como los endpoints creados durante el laboratorio.
+We can see the description of the services as well as the endpoints created during the lab.
 
-**Descripción de los servicios:**
+**Service descriptions:**
 
 ***svc-clusterip***
 
@@ -248,7 +248,7 @@ Podemos ver la descrpción de los servicios así como los endpoints creados dura
   <img width="820" height="193" alt="image" src="https://github.com/user-attachments/assets/6888792b-d747-4511-b34e-00e7a0fd1e5d" />
 </p>
 
-También, podemos ver un estado general de los deployments y servicios desde la interfaz web.
+We can also see a general status of the deployments and services from the web interface.
 
 **Deployments:**
 
@@ -261,11 +261,3 @@ También, podemos ver un estado general de los deployments y servicios desde la 
 <p align="center">
   <img width="1629" height="360" alt="image" src="https://github.com/user-attachments/assets/73a2f65e-bc76-4767-b141-75754a29e912" />
 </p>
-
-
-
-
-
-
-
-
