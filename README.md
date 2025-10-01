@@ -4,7 +4,7 @@ This repository aims to explain the implementation of 4 deployments (each with d
 
 ## Solution:
 
-The following steps were used to complete the lab:
+The following steps were used to complete the lab.
 
 ## 1. Minikube Configuration
 
@@ -12,6 +12,9 @@ Minikube initialization was performed using the command:
 ```bash
 minikube start --driver=docker
 ```
+<p align="center">
+  <img width="892" height="328" alt="image" src="https://github.com/user-attachments/assets/fd0c7db5-fd80-419c-83df-a0dfa2ccd2ac" />
+</p>
 
 Subsequently, the cluster status was viewed using:
 ```bash
@@ -59,7 +62,7 @@ kubectl top nodes
 
 **Definitions:**
 
-- **port**: Port exposed by the Service within the cluster (where other pods/services connect to).
+- **port**: Port exposed by the service within the cluster (where other pods/services connect to).
 - **targetPort**: Port where the application inside the container/pod actually listens.
 - **NodePort**: Port exposed on the node, accessible externally (range: 30000-32767).
 
