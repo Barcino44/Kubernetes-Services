@@ -96,6 +96,8 @@ Al no existir un proveedor de nube, fue creado un tunel para acceder al servicio
 
 <img width="1059" height="216" alt="image" src="https://github.com/user-attachments/assets/4da38549-f51f-4455-9de3-e5336130766d" />
 
+<img width="827" height="141" alt="image" src="https://github.com/user-attachments/assets/ca12ef3b-3341-4b37-8783-1a9cda5ce576" />
+
 <img width="1002" height="311" alt="image" src="https://github.com/user-attachments/assets/41de8304-278b-4b3d-bdbe-a03d1697d783" />
 
 ***La imagen de tomcat sin modificaciones arroja 404***
@@ -117,11 +119,81 @@ Vemos que el puerto disponible para el acceso de otros nodos fue auto generado (
 
 <img width="833" height="129" alt="image" src="https://github.com/user-attachments/assets/4cb7c091-63ed-4d53-a62d-01f39a3f661a" />
 
-Será usada la dirección ip del nodo maestro (minikube ip) + dicho puerto para acceder al servicio.
+Será usada la dirección ip provista por minikube (minikube ip) + dicho puerto para acceder al servicio.
 
 <img width="494" height="65" alt="image" src="https://github.com/user-attachments/assets/09196755-34a2-4fd5-8f0f-18f71a662a18" />
 
 ### 2.4 Ingress (Caddy)
+
+Para el caso de Ingress, fue usada la imagen de Caddy.
+
+En este caso, también se sigue un proceso similar. Fue creado el deployment con 2 replicas con ayuda de.
+
+````
+kubectl create deployment app-ingress --image=caddy --replicas=2
+````
+Y fue expuesto dicho deployment. Sin embargo, el tipo de servicio especificado fue ClusterIP. Como se vio anteriormente, normalmente solo puede ser accedido por pods al interior del cluster, esto cambiará con ayuda de ingress.
+````
+kubectl expose deployment app-ingress --port=80 --target-port=80 --type=Cluster-ip --name=svc-ingress
+````
+Tras lo anterior, fue creado un archivo ``myapp-ingress.yaml``  para definir el ingress. Este es mostrado a continuación.
+
+````
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-http-echo
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: svc-ingress
+            port:
+              number: 80
+````
+En dicho yaml, es definido.
+
+- El nombre del ingress ``ingress-http-echo``
+- El nombre de la clase ``ngnix`` (Es un nombre cualquiera, debería ser caddy para ser diciente).
+- El servicio al que apunta el ingress ``svc-ingress`` (Anteriormente expuesto).
+- El puerto al cual ingress envía el tráfico  ``port: number 80`` (puerto de la aplicación).
+
+Posteriormente, se aplican las configuraciones de dicho yaml con ayuda de.
+
+````
+kubectl apply -f myapp-ingress.yaml
+````
+Tras esto, se pueden visualizar los ingress presentes en el cluster con ayuda de.
+
+<img width="682" height="62" alt="image" src="https://github.com/user-attachments/assets/c0eb6c20-9272-43dd-b778-588758f78257" />
+
+La dirección ip del ingress tarda alrededor de un minuto en ser asignada. En este caso, fue asignada la correspondiente a la ip del cluster (minikube ip).
+
+<img width="626" height="67" alt="image" src="https://github.com/user-attachments/assets/ce60ef0d-a247-4540-a452-b076bb7ed72e" />
+
+Finalmente, se emplea dicha ip para acceder al servicio de caddy.
+
+<img width="802" height="308" alt="image" src="https://github.com/user-attachments/assets/beb7a43e-8bd3-4c7c-a979-71b9963dd26e" />
+
+Vemos que se puede acceder a el a pesar de que caddy se encuentra corriendo en servicio de tipo ClusterIP.
+
+Para finalizar podemos ver un estado general de los deployments y servicios desde la interfaz web.
+
+<img width="1627" height="671" alt="image" src="https://github.com/user-attachments/assets/6402708c-b19d-4c82-bd69-e3c6e0421545" />
+
+
+<img width="1629" height="360" alt="image" src="https://github.com/user-attachments/assets/73a2f65e-bc76-4767-b141-75754a29e912" />
+
+
+
+
 
 
 
